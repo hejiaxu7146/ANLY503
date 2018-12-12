@@ -1,0 +1,33 @@
+---
+title: "3d"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+```{r}
+library(plyr)
+library(networkD3)
+library(igraph)
+MyData <- read.csv(file="finalmovie.csv", header=TRUE, sep=",")
+library(threejs)
+library(htmlwidgets)
+x = MyData$popularity
+y = MyData$vote_average
+z = MyData$budget
+MyJ3=scatterplot3js(x, y, z,
+                    color = as.factor(as.numeric(MyData$genres)),
+                    axisLabels=c("Popularity",
+                                 "Average Rating Votes", "Budget"), size = 0.4,
+                    labels=sprintf("Popularity=%.2f, Average Rating Votes=%.2f, Budget=%.2f", x, y, z),
+                    brush=TRUE, main = "3D Rotatable Plot for Popularity, Average Rating and Budget")
+saveWidget(MyJ3, file="3drotatable.html", selfcontained = TRUE, libdir =
+             NULL,
+           
+           background = "white")
+```
+

@@ -1,0 +1,59 @@
+---
+title: "PlotlyWR"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(plotly)
+library(datasets)
+library(xml2)
+library(htmlwidgets)
+Sys.setenv("plotly_username"="hejiaxu7146")
+Sys.setenv("plotly_api_key"="u6Mkt8rls6Axea4UDX4U")
+MyData <- read.csv(file="heatdata.csv", header=TRUE, sep=",")
+re <- MyData$revenue
+layout <- list(
+  title = "Heat Map of Revenue", 
+  xaxis = list(title = "Months"),
+  yaxis = list(title = "Years")
+
+)
+p <- plot_ly(y = c(2010, 2011, 2012, 2013, 2014, 2015), 
+             x = c("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"),
+             z = matrix(c(re), nrow = 12, ncol = 6, byrow = T), type = "heatmap", colors = colorRamp(c("white", "firebrick3")))
+p <- layout(p, title=layout$title, xaxis=layout$xaxis, yaxis = layout$yaxis)
+api_create(p, filename="heatmap")
+htmlwidgets::saveWidget(as_widget(p), "heatmap.html")
+```
+
+```{r}
+MyData <- read.csv(file="heatdata.csv", header=TRUE, sep=",")
+re <- MyData$revenue
+re
+```
+
+
+```{r}
+layout <- list(
+
+  title = "Heat Map of Revenue", 
+
+  xaxis = list(title = "Months"),
+  yaxis = list(title = "Years")
+
+)
+p <- plot_ly(y = c(2010, 2011, 2012, 2013, 2014, 2015), 
+             x = c("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"),
+             z = matrix(c(re), nrow = 12, ncol = 6, byrow = T), type = "heatmap", colors = colorRamp(c("white", "firebrick3")))
+p <- layout(p, title=layout$title, xaxis=layout$xaxis)
+p
+```
+
+```{r}
+c(re)
+```
+
