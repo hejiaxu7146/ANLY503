@@ -1,0 +1,60 @@
+---
+title: "LeafletLeile"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(maps)
+library(leaflet)
+library(htmlwidgets)
+library(htmltools)
+
+mmap <- read.csv("finalworldmap.csv", header = TRUE)
+```
+
+```{r}
+popup <- paste0("<strong>Location: </strong>", 
+
+                mmap$countries,
+
+                "<br><strong>Number of Movies: </strong>", 
+
+                mmap$count,
+                
+                "<br><strong>Average Movies Popularity: </strong>", 
+
+                mmap$popular,
+                
+                "<br><strong>Average Movies Rating: </strong>", 
+
+                mmap$vote,
+
+                "<br><strong>Average Revenue: </strong>", 
+
+                mmap$re)
+```
+
+```{r}
+m <- leaflet(mmap) %>% 
+
+  addProviderTiles(providers$CartoDB.Positron) %>% 
+
+  setView(lng = 0, lat = 0, zoom = 4) %>% 
+  
+  addMarkers(
+
+    popup = popup,
+
+    clusterOptions = markerClusterOptions()
+
+  )
+m
+```
+```{r}
+saveWidget(m, 'Popular Movies Made by Countries.html', selfcontained = TRUE)
+```
+
