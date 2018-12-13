@@ -43,7 +43,7 @@ m <- leaflet(mmap) %>%
 
   addProviderTiles(providers$CartoDB.Positron) %>% 
 
-  setView(lng = 0, lat = 0, zoom = 4) %>% 
+  setView(lng = 0, lat = 50, zoom = 4) %>% 
   
   addMarkers(
 
