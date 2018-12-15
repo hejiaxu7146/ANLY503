@@ -1,5 +1,5 @@
 ---
-title: "LeafletLeile"
+title: "leaflettest"
 output: html_document
 ---
 
@@ -14,6 +14,15 @@ library(htmlwidgets)
 library(htmltools)
 
 mmap <- read.csv("finalworldmap.csv", header = TRUE)
+mmap1 <- subset(mmap, popular >30)
+mmap2 <- mmap[-c(17, 11, 14), ]
+WorldCountry <-geojsonio::geojson_read("countries.geo.json", what = "sp")
+data1 <- WorldCountry[WorldCountry$name %in% mmap2$countries, ]
+colnames(mmap2)[1] <- "name"
+mmap3 <- merge(WorldCountry, mmap2, all = TRUE)
+mmap3[is.na(mmap3)] <- 0
+#WorldCountry$popular <- mmap3$popular
+#WorldCountry[is.na(WorldCountry)] <- 0
 ```
 
 ```{r}
@@ -36,25 +45,105 @@ popup <- paste0("<strong>Location: </strong>",
                 "<br><strong>Average Revenue: </strong>", 
 
                 mmap$re)
+
+popup1 <- paste0("<strong>Location: </strong>", 
+
+                mmap1$countries,
+
+                "<br><strong>Number of Movies: </strong>", 
+
+                mmap1$count,
+                
+                "<br><strong>Average Movies Popularity: </strong>", 
+
+                mmap1$popular,
+                
+                "<br><strong>Average Movies Rating: </strong>", 
+
+                mmap1$vote,
+
+                "<br><strong>Average Revenue: </strong>", 
+
+                mmap1$re)
+
+bins <- c(0,1,2,3,4,5,6,7,8,9,10,Inf)
+pal <- colorBin("YlOrRd", domain = mmap$popular, bins = bins)
+
+labels <- sprintf(
+  "<strong>%s</strong><br/>",
+  WorldCountry$name) %>% lapply(htmltools::HTML)
+
 ```
 
+
 ```{r}
-m <- leaflet(mmap) %>% 
+m <- leaflet(WorldCountry) %>% 
 
   addProviderTiles(providers$CartoDB.Positron) %>% 
 
   setView(lng = 0, lat = 50, zoom = 4) %>% 
   
+  addPolygons(
+  fillColor = ~pal(mmap$popular),
+  weight = 2,
+  opacity = 1,
+  color = 'white',
+  dashArray = '3',
+  fillOpacity = 0.7,
+  highlight = highlightOptions(
+     weight = 5,
+    color = "#666",
+    dashArray = "",
+    fillOpacity = 0.7,
+    bringToFront = TRUE),
+  label = labels,
+  labelOptions = labelOptions(
+    style = list("font-weight" = "normal", padding = "3px 8px"),
+    textsize = "15px",
+    direction = "auto")
+)%>% 
+
+  
   addMarkers(
+    
+    data = mmap,
+    
+    lat = mmap$latitude,
+    
+    lng = mmap$longitude,
 
     popup = popup,
 
-    clusterOptions = markerClusterOptions()
+    clusterOptions = markerClusterOptions(),
+    
+    group = "All countries"
 
+  )%>%
+  addAwesomeMarkers(
+    
+    data = mmap1,
+    
+    lat = mmap1$latitude,
+    
+    lng = mmap1$longitude,
+
+    popup = popup1,
+
+    clusterOptions = markerClusterOptions(),
+    
+    group = "Countries with popularity more than 30"
+    
+
+  )%>%
+  addLayersControl(
+    
+    baseGroups = c("All countries", "Countries with popularity more than 30"),
+    
+    options = layersControlOptions(collapsed = FALSE)
   )
 m
 ```
+
 ```{r}
 saveWidget(m, 'Popular Movies Made by Countries.html', selfcontained = TRUE)
 ```
-
