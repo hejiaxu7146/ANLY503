@@ -1,0 +1,131 @@
+---
+title: "Leaflet"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(ggplot2)
+
+library(ggthemes)
+library(gridExtra)
+library(scales)
+MyData <- read.csv(file="finalmovie.csv", header=TRUE, sep=",")
+ggplot_1 <- ggplot(data=MyData) +
+geom_point(mapping=aes(x = vote_average, y = revenue, color=genres)) +
+geom_smooth(mapping=aes(x = vote_average, y = revenue)) +
+geom_text(mapping = aes(group = genres, label = ifelse(!between(revenue,-6*IQR(revenue), 6*IQR(revenue)), 
+                                                paste(title),'')),
+            hjust = 0, vjust=0, 
+
+            nudge_x = 0.2, nudge_y = 0.2, angle=30, size=3) +
+ggtitle("Movies' revenue and rating") +
+theme_calc()
+```
+
+```{r}
+ggplot_2 <- ggplot(data=MyData, aes(x = vote_average, y = revenue, color=genres)) +
+geom_point() +
+geom_smooth(mapping=aes(x = vote_average, y = revenue)) +
+geom_text(mapping = aes(group = genres, label = ifelse(!between(revenue,-6*IQR(revenue), 6*IQR(revenue)), 
+                                                paste(title),'')),
+            hjust = 0, vjust=0, 
+
+            nudge_x = 0.2, nudge_y = 0.2, angle=30, size=3) +
+ggtitle("Movies' revenue and rating by Genres") +
+theme_calc()
+ggsave("ggplotno4.png", ggplot_2, width = 10, height = 6, units = "in", dpi=500)
+```
+
+```{r}
+grid.arrange(ggplot_1, ggplot_2, ncol=2, top = 'The relationship between Rating and Revenue')
+ggsave("ggplotno1.png", g, width = 15, height = 6, units = "in", dpi=500)
+```
+
+```{r}
+ggplot(data=MyData, aes(x = genres, y = revenue)) +
+geom_boxplot(aes(color=genres)) +
+geom_jitter(aes(color=genres)) +
+geom_text(aes(label=label), na.rm=TRUE, hjust = 0, vjust=0, 
+
+            nudge_x = 0.2, nudge_y = 0.2, angle=30, size=3)
+ggtitle("Boxplot for Revenue by different Genres") +
+theme_economist()
+ggsave("ggplotno2.png", width = 15, height = 6, units = "in", dpi=500)
+```
+
+```{r}
+ggplot(data=MyData, aes(x = genres, y = revenue)) +
+geom_boxplot(aes(color=genres)) +
+geom_jitter(aes(color=genres)) +
+geom_text(aes(group = genres, label = ifelse(!between(revenue,-6*IQR(revenue), 6*IQR(revenue)), 
+                                                paste(title),'')),
+            hjust = 0, vjust=0, 
+
+            nudge_x = 0.2, nudge_y = 0.2, angle=30, size=3) +
+ggtitle("Boxplot for Revenue by different Genres") +
+theme_economist()
+ggsave("ggplotno2.png", width = 15, height = 6, units = "in", dpi=500)
+```
+
+
+```{r}
+ggplot(data=MyData, aes(vote_average)) +
+geom_histogram(aes(y = ..count..),
+col="white",
+fill="blue",
+alpha = .2) +
+geom_density(col=2) +
+geom_freqpoly(aes(y = ..count..)) +
+ggtitle("Rating Votes Count") +
+xlab("Rating Votes") +
+theme_solarized()
+```
+
+```{r}
+g1 <- ggplot(data=MyData, aes(vote_average, fill = genres)) +
+geom_bar() +
+geom_density(col=2) +
+geom_freqpoly(aes(y = ..count..)) +
+ggtitle("Rating Votes Count") +
+xlab("Rating Votes") +
+  ylab("Count Numbers") 
+g1
+```
+```{r}
+g2 <- ggplot(data=MyData, aes(x = genres)) +
+geom_bar(aes(y = ..count.., color = genres, fill = genres))+
+ggtitle("The Distribution of Genres") +
+xlab("Genres")+
+  ylab("Count Numbers")
+g2
+```
+
+```{r}
+g3 <- ggplot(data=MyData, aes(y = budget, x = genres)) +
+geom_bar(stat="identity", aes(col = genres)) +
+ggtitle("Budget for Different Genres") +
+xlab("Genres") +
+  ylab("Budget") +
+  theme_minimal()
+g3
+```
+
+```{r}
+g4 <- ggplot(data=MyData, aes(y = revenue, x = genres)) +
+geom_bar(stat="identity", aes(col = genres)) +
+ggtitle("Revenue for Different Genres") +
+xlab("Genres") +
+ylab("Revenue") +
+  theme_minimal()
+g4
+```
+
+```{r}
+gall <- grid.arrange(g1, g2, g3, g4, ncol=2, top = 'Distribution of Geners with Rating, Budget, Revenue')
+ggsave("ggplotno3.png", gall, width = 30, height = 12, units = "in", dpi=500)
+```
+

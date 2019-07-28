@@ -1,1 +1,1 @@
-All the code part
+For all the codes.
